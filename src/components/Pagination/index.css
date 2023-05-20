@@ -1,0 +1,40 @@
+.first-page {
+  font-size: 16px;
+  padding: 0px 9px;
+  border-radius: 50%;
+  border: 1px solid;
+  margin: 7px;
+}
+.cm-page {
+  font-size: 20px;
+  padding-top: 0px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 50%;
+  border: 1px solid;
+  margin: 7px;
+}
+.last-page {
+  font-size: 16px;
+  padding: 0px 9px;
+  border-radius: 50%;
+  border: 1px solid;
+  margin: 7px;
+}
+ul {
+  list-style-type: none;
+  display: flex;
+  padding: 0px;
+  margin-left: 10px;
+}
+li {
+  margin-right: 9px;
+}
+.number-page {
+  padding: 5px 10px;
+  border-radius: 50%;
+  border: 1px solid black;
+}
+.page-container {
+  display: flex;
+}
