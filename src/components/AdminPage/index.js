@@ -52,15 +52,14 @@ class AdminPage extends Component {
 
   getPage = (id) => {
     const { AdminData, data_length, pageItems } = this.state;
-    console.log(pageItems);
-    const { status } = pageItems.find((each) => each.item === id);
+    console.log(AdminData);
     const first = id * 10;
     const second = data_length < id * 10 ? data_length : (id + 1) * 10;
     const pageData = AdminData.slice(first, second);
+
     this.setState({
       pagesData: pageData,
       page: id,
-      headerRowStatus: status,
     });
   };
 
@@ -102,15 +101,15 @@ class AdminPage extends Component {
   };
 
   getDetails = (Data, id) => {
-    let checkElement = Data.find((each) => each.id === id);
-    checkElement = {
-      ...checkElement,
-      checkStatus: !checkElement.checkStatus,
+    const checkIndex = Data.findIndex((each) => each.id === id);
+    let Element = Data[checkIndex];
+    Element = {
+      ...Element,
+      checkStatus: !Element.checkStatus,
     };
-    const checkIndex = checkElement.id - 1;
     const firstHalf = Data.slice(0, checkIndex);
     const secondHalf = Data.slice(checkIndex + 1, Data.length);
-    return [...firstHalf, checkElement, ...secondHalf];
+    return [...firstHalf, Element, ...secondHalf];
   };
 
   getCheckStatus = (id) => {
@@ -121,6 +120,31 @@ class AdminPage extends Component {
       AdminData: adminStatusData,
       usersData: masterData,
     });
+  };
+
+  modifiedArray = (data, id) => {
+    const fIndex = data.findIndex(
+      (each) => each.id === id && each.checkStatus === true
+    );
+    if (fIndex === -1) {
+      return data;
+    } else {
+      return [...data.slice(0, fIndex), ...data.slice(fIndex + 1, data.length)];
+    }
+  };
+
+  onDeleteRow = (id) => {
+    const { AdminData, usersData, page } = this.state;
+    const newAdminData = this.modifiedArray(AdminData, id);
+    const newMaterData = this.modifiedArray(usersData, id);
+    this.setState(
+      {
+        AdminData: newAdminData,
+        usersData: newMaterData,
+        data_length: newAdminData.length,
+      },
+      () => this.getPage(page)
+    );
   };
 
   selectPageUsers = () => {
@@ -145,6 +169,33 @@ class AdminPage extends Component {
       pageItems: [...firstHalf, checkElement, ...secondHalf],
       pagesData: filteredpageData,
     });
+  };
+
+  deleteArray = (data, l) => {
+    for (let item of l) {
+      const { id } = item;
+      const fIndex = data.findIndex((each) => each.id === id);
+      data = [...data.slice(0, fIndex), ...data.slice(fIndex + 1, data.length)];
+    }
+    return data;
+  };
+
+  onDeletePageRows = () => {
+    const { AdminData, usersData, pagesData, page } = this.state;
+    const deleteAdminData = pagesData.filter(
+      (each) => each.checkStatus === true
+    );
+    const newAdminData = this.deleteArray(AdminData, deleteAdminData);
+    const newMaterData = this.deleteArray(usersData, deleteAdminData);
+    console.log("dsfsd");
+    console.log(newAdminData);
+    this.setState(
+      {
+        AdminData: newAdminData,
+        usersData: newMaterData,
+      },
+      () => this.getPage(page)
+    );
   };
 
   render() {
@@ -191,13 +242,18 @@ class AdminPage extends Component {
                 user={each}
                 getCheckStatus={this.getCheckStatus}
                 key={each.id}
+                onDeleteRow={this.onDeleteRow}
               />
             ))}
           </tbody>
         </table>
         <div className="second-section">
           <div>
-            <button type="button" className="deselect-button">
+            <button
+              type="button"
+              className="deselect-button"
+              onClick={this.onDeletePageRows}
+            >
               Delete Selected
             </button>
           </div>

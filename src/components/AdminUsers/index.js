@@ -3,17 +3,17 @@ import { RiEditBoxLine } from "react-icons/ri";
 import "./index.css";
 
 const AdminUsers = (props) => {
-  const { user, getCheckStatus } = props;
+  const { user, getCheckStatus, onDeleteRow } = props;
   const { name, email, role, id, checkStatus } = user;
 
   return (
     <tr>
       <td>
-        {checkStatus === true ? (
-          <input type="checkbox" checked onClick={() => getCheckStatus(id)} />
-        ) : (
-          <input type="checkbox" onClick={() => getCheckStatus(id)} />
-        )}
+        <input
+          type="checkbox"
+          defaultChecked={checkStatus}
+          onClick={() => getCheckStatus(id)}
+        />
       </td>
       <td>{name}</td>
       <td>{email}</td>
@@ -21,7 +21,10 @@ const AdminUsers = (props) => {
       <td>
         <div>
           <RiEditBoxLine className="edit" />
-          <MdDeleteOutline className="delete-icon" />
+          <MdDeleteOutline
+            className="delete-icon"
+            onClick={() => onDeleteRow(id)}
+          />
         </div>
       </td>
     </tr>
