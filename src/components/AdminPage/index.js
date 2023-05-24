@@ -40,6 +40,7 @@ class AdminPage extends Component {
       email: each.email,
       role: each.role,
       checkStatus: false,
+      editStatus: false,
     }));
 
     this.setState({
@@ -52,7 +53,6 @@ class AdminPage extends Component {
 
   getPage = (id) => {
     const { AdminData, data_length, pageItems } = this.state;
-    console.log(AdminData);
     const first = id * 10;
     const second = data_length < id * 10 ? data_length : (id + 1) * 10;
     const pageData = AdminData.slice(first, second);
@@ -61,6 +61,53 @@ class AdminPage extends Component {
       pagesData: pageData,
       page: id,
     });
+  };
+
+  onEditRow = (id) => {
+    const { AdminData, page } = this.state;
+    const filteredData = AdminData.map((each) => {
+      if (each.id === id) {
+        return { ...each, editStatus: !each.editStatus };
+      } else {
+        return each;
+      }
+    });
+    this.setState(
+      {
+        AdminData: filteredData,
+      },
+      () => this.getPage(page)
+    );
+  };
+
+  getEditDetails = (data, id, userFeild, r) => {
+    const filteredData = data.map((each) => {
+      if (each.id === id) {
+        if (r === "name") {
+          return { ...each, name: userFeild };
+        } else if (r === "email") {
+          return { ...each, email: userFeild };
+        } else {
+          return { ...each, role: userFeild };
+        }
+      } else {
+        return each;
+      }
+    });
+    return filteredData;
+  };
+
+  onEditFeild = (id, userFeild, r) => {
+    const { AdminData, page, usersData } = this.state;
+    const newAdminData = this.getEditDetails(AdminData, id, userFeild, r);
+    const newMaterData = this.getEditDetails(usersData, id, userFeild, r);
+    this.setState(
+      {
+        AdminData: newAdminData,
+        usersData: newMaterData,
+      },
+      () => this.getPage(page)
+    );
   };
 
   getSearchResults = (e) => {
@@ -148,27 +195,33 @@ class AdminPage extends Component {
   };
 
   selectPageUsers = () => {
-    const { pagesData, page, pageItems } = this.state;
-    let checkElement = pageItems.find((each) => each.item === page);
-    checkElement = {
-      ...checkElement,
-      status: !checkElement.status,
-    };
-    const checkIndex = checkElement.item;
-    const firstHalf = pageItems.slice(0, checkIndex);
-    const secondHalf = pageItems.slice(checkIndex + 1, pageItems.length);
-    const filteredpageData = pagesData.map((each) => ({
-      ...each,
-      checkStatus: checkElement.status,
-    }));
-    console.log("entered");
-    console.log(filteredpageData);
-
-    this.setState({
-      headerRowStatus: !checkElement.status,
-      pageItems: [...firstHalf, checkElement, ...secondHalf],
-      pagesData: filteredpageData,
+    const { pagesData, page, pageItems, AdminData } = this.state;
+    const updatedStatus = !pageItems[page].status;
+    const updatedPagesItem = pageItems.map((each) => {
+      if (each.item === page) {
+        return { ...each, status: updatedStatus };
+      } else {
+        return each;
+      }
     });
+    let temp = AdminData;
+    const filteredpageData = pagesData.map((each) => each.id);
+    for (let each of filteredpageData) {
+      temp = temp.map((item) => {
+        if (item.id === each) {
+          return { ...item, checkStatus: updatedStatus };
+        } else {
+          return item;
+        }
+      });
+    }
+    this.setState(
+      {
+        pageItems: updatedPagesItem,
+        AdminData: temp,
+      },
+      () => this.getPage(page)
+    );
   };
 
   deleteArray = (data, l) => {
@@ -187,8 +240,6 @@ class AdminPage extends Component {
     );
     const newAdminData = this.deleteArray(AdminData, deleteAdminData);
     const newMaterData = this.deleteArray(usersData, deleteAdminData);
-    console.log("dsfsd");
-    console.log(newAdminData);
     this.setState(
       {
         AdminData: newAdminData,
@@ -199,14 +250,8 @@ class AdminPage extends Component {
   };
 
   render() {
-    const {
-      pagesData,
-      data_length,
-      searchValue,
-      headerRowStatus,
-      pageItems,
-      page,
-    } = this.state;
+    const { pagesData, data_length, searchValue, pageItems, page } = this.state;
+    const { status } = pageItems[page];
 
     return (
       <div className="Admin-container">
@@ -227,7 +272,7 @@ class AdminPage extends Component {
                   type="checkbox"
                   onClick={this.selectPageUsers}
                   key={page}
-                  defaultChecked={headerRowStatus}
+                  defaultChecked={status}
                 />
               </th>
               <th>Name</th>
@@ -243,6 +288,9 @@ class AdminPage extends Component {
                 getCheckStatus={this.getCheckStatus}
                 key={each.id}
                 onDeleteRow={this.onDeleteRow}
+                onEditRow={this.onEditRow}
+                onEditFeild={this.onEditFeild}
+                page={page}
               />
             ))}
           </tbody>
