@@ -12,11 +12,10 @@ const AdminUsers = (props) => {
     page,
   } = props;
   const { name, email, role, id, checkStatus, editStatus } = user;
-  console.log(user);
 
   return (
     <tr>
-      <td key={page}>
+      <td key={checkStatus}>
         <input
           type="checkbox"
           defaultChecked={checkStatus}

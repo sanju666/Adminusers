@@ -21,7 +21,6 @@ class AdminPage extends Component {
     search: "",
     page: 0,
     pageItems: items,
-    headerRowStatus: false,
   };
 
   componentDidMount() {
@@ -53,10 +52,12 @@ class AdminPage extends Component {
 
   getPage = (id) => {
     const { AdminData, data_length, pageItems } = this.state;
+    console.log(AdminData);
     const first = id * 10;
     const second = data_length < id * 10 ? data_length : (id + 1) * 10;
     const pageData = AdminData.slice(first, second);
-
+    console.log("hj");
+    console.log(pageData);
     this.setState({
       pagesData: pageData,
       page: id,
@@ -160,13 +161,17 @@ class AdminPage extends Component {
   };
 
   getCheckStatus = (id) => {
-    const { AdminData, usersData } = this.state;
+    const { AdminData, usersData, page } = this.state;
     const adminStatusData = this.getDetails(AdminData, id);
     const masterData = this.getDetails(usersData, id);
-    this.setState({
-      AdminData: adminStatusData,
-      usersData: masterData,
-    });
+    console.log(adminStatusData);
+    this.setState(
+      {
+        AdminData: adminStatusData,
+        usersData: masterData,
+      },
+      () => this.getPage(page)
+    );
   };
 
   modifiedArray = (data, id) => {
@@ -195,7 +200,7 @@ class AdminPage extends Component {
   };
 
   selectPageUsers = () => {
-    const { pagesData, page, pageItems, AdminData } = this.state;
+    const { pagesData, page, pageItems, AdminData, usersData } = this.state;
     const updatedStatus = !pageItems[page].status;
     const updatedPagesItem = pageItems.map((each) => {
       if (each.item === page) {
@@ -204,10 +209,24 @@ class AdminPage extends Component {
         return each;
       }
     });
-    let temp = AdminData;
+    let tempAdmin = AdminData;
+    let tempUser = usersData;
     const filteredpageData = pagesData.map((each) => each.id);
+    const updatedPageData = pagesData.map((each) => ({
+      ...each,
+      checkStatus: updatedStatus,
+    }));
     for (let each of filteredpageData) {
-      temp = temp.map((item) => {
+      tempAdmin = tempAdmin.map((item) => {
+        if (item.id === each) {
+          return { ...item, checkStatus: updatedStatus };
+        } else {
+          return item;
+        }
+      });
+    }
+    for (let each of filteredpageData) {
+      tempUser = tempUser.map((item) => {
         if (item.id === each) {
           return { ...item, checkStatus: updatedStatus };
         } else {
@@ -218,7 +237,9 @@ class AdminPage extends Component {
     this.setState(
       {
         pageItems: updatedPagesItem,
-        AdminData: temp,
+        AdminData: tempAdmin,
+        pagesData: updatedPageData,
+        usersData: tempUser,
       },
       () => this.getPage(page)
     );
@@ -230,28 +251,37 @@ class AdminPage extends Component {
       const fIndex = data.findIndex((each) => each.id === id);
       data = [...data.slice(0, fIndex), ...data.slice(fIndex + 1, data.length)];
     }
+    data = data.map((each) => ({ ...each, checkStatus: false }));
     return data;
   };
 
   onDeletePageRows = () => {
-    const { AdminData, usersData, pagesData, page } = this.state;
+    const { AdminData, usersData, pagesData, page, pageItems } = this.state;
     const deleteAdminData = pagesData.filter(
       (each) => each.checkStatus === true
     );
     const newAdminData = this.deleteArray(AdminData, deleteAdminData);
     const newMaterData = this.deleteArray(usersData, deleteAdminData);
+    const updatedPageItems = pageItems.map((each) => ({
+      ...each,
+      status: false,
+    }));
+    console.log(updatedPageItems);
     this.setState(
       {
         AdminData: newAdminData,
         usersData: newMaterData,
+        pageItems: updatedPageItems,
+        data_length: newAdminData.length,
       },
-      () => this.getPage(page)
+      () => this.getPage(0)
     );
   };
 
   render() {
     const { pagesData, data_length, searchValue, pageItems, page } = this.state;
     const { status } = pageItems[page];
+    console.log(pagesData);
 
     return (
       <div className="Admin-container">
@@ -271,7 +301,7 @@ class AdminPage extends Component {
                 <input
                   type="checkbox"
                   onClick={this.selectPageUsers}
-                  key={page}
+                  key={status}
                   defaultChecked={status}
                 />
               </th>
