@@ -2,7 +2,7 @@
   font-size: 16px;
   padding: 0px 9px;
   border-radius: 50%;
-  border: 1px solid;
+
   margin: 7px;
 }
 .cm-page {
@@ -11,15 +11,19 @@
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 50%;
-  border: 1px solid;
+
   margin: 7px;
 }
 .last-page {
   font-size: 16px;
   padding: 0px 9px;
   border-radius: 50%;
-  border: 1px solid;
   margin: 7px;
+}
+.navigate-buttons {
+  border: 1px solid;
+  background-color: #0080ff;
+  color: #ffffff;
 }
 ul {
   list-style-type: none;
@@ -33,7 +37,16 @@ li {
 .number-page {
   padding: 5px 10px;
   border-radius: 50%;
-  border: 1px solid black;
+  border: 1px solid;
+  background-color: #0080ff;
+  color: #ffffff;
+}
+.active-number-page {
+  padding: 5px 10px;
+  border-radius: 50%;
+  border: 1px solid #0080ff;
+  background-color: transparent;
+  color: #0080ff;
 }
 .page-container {
   display: flex;

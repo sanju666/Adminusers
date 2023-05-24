@@ -27,6 +27,8 @@ class AdminPage extends Component {
     this.getUsers();
   }
 
+  //fetching the users
+
   getUsers = async () => {
     const url =
       "https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json";
@@ -50,19 +52,20 @@ class AdminPage extends Component {
     });
   };
 
+  //getting the users in the respective page
+
   getPage = (id) => {
-    const { AdminData, data_length, pageItems } = this.state;
-    console.log(AdminData);
+    const { AdminData, data_length } = this.state;
     const first = id * 10;
     const second = data_length < id * 10 ? data_length : (id + 1) * 10;
     const pageData = AdminData.slice(first, second);
-    console.log("hj");
-    console.log(pageData);
     this.setState({
       pagesData: pageData,
       page: id,
     });
   };
+
+  //Changing the row status to edit mode
 
   onEditRow = (id) => {
     const { AdminData, page } = this.state;
@@ -98,6 +101,8 @@ class AdminPage extends Component {
     return filteredData;
   };
 
+  //Editing the respective row in the page
+
   onEditFeild = (id, userFeild, r) => {
     const { AdminData, page, usersData } = this.state;
     const newAdminData = this.getEditDetails(AdminData, id, userFeild, r);
@@ -110,6 +115,8 @@ class AdminPage extends Component {
       () => this.getPage(page)
     );
   };
+
+  //fetching the search results
 
   getSearchResults = (e) => {
     const searchValue = e.target.value;
@@ -130,17 +137,20 @@ class AdminPage extends Component {
         AdminData: filteredData,
         data_length: filteredData.length,
         search: searchValue,
-        page: 0,
       },
       () => this.getPage(0)
     );
   };
+
+  //getting the previous page
 
   previousPage = () => {
     const { page } = this.state;
     const previous = page === 0 ? page : page - 1;
     this.getPage(previous);
   };
+
+  //getting the next page
 
   nextPage = (id) => {
     const { page } = this.state;
@@ -160,11 +170,12 @@ class AdminPage extends Component {
     return [...firstHalf, Element, ...secondHalf];
   };
 
+  //changing the checkbox status in the row
+
   getCheckStatus = (id) => {
     const { AdminData, usersData, page } = this.state;
     const adminStatusData = this.getDetails(AdminData, id);
     const masterData = this.getDetails(usersData, id);
-    console.log(adminStatusData);
     this.setState(
       {
         AdminData: adminStatusData,
@@ -185,6 +196,8 @@ class AdminPage extends Component {
     }
   };
 
+  //deleting the specific row
+
   onDeleteRow = (id) => {
     const { AdminData, usersData, page } = this.state;
     const newAdminData = this.modifiedArray(AdminData, id);
@@ -198,6 +211,8 @@ class AdminPage extends Component {
       () => this.getPage(page)
     );
   };
+
+  //selecting the users whose checkbox status is true
 
   selectPageUsers = () => {
     const { pagesData, page, pageItems, AdminData, usersData } = this.state;
@@ -255,8 +270,10 @@ class AdminPage extends Component {
     return data;
   };
 
+  //deleting the users using the delete button
+
   onDeletePageRows = () => {
-    const { AdminData, usersData, pagesData, page, pageItems } = this.state;
+    const { AdminData, usersData, pagesData, pageItems } = this.state;
     const deleteAdminData = pagesData.filter(
       (each) => each.checkStatus === true
     );
@@ -281,7 +298,6 @@ class AdminPage extends Component {
   render() {
     const { pagesData, data_length, searchValue, pageItems, page } = this.state;
     const { status } = pageItems[page];
-    console.log(pagesData);
 
     return (
       <div className="Admin-container">
@@ -341,6 +357,7 @@ class AdminPage extends Component {
               getPage={this.getPage}
               previousPage={this.previousPage}
               nextPage={this.nextPage}
+              page={page}
             />
           </div>
         </div>
